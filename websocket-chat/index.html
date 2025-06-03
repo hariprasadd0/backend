@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat Room</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💬 Chat Room</h1>
+            <div class="user-info">
+                <span id="userCount">0 users online</span>
+                <button id="leaveBtn" class="btn btn-danger" disabled>Leave Chat</button>
+            </div>
+        </header>
+
+        <div id="loginScreen" class="login-screen">
+            <div class="login-box">
+                <h2>Join the Chat</h2>
+                <input type="text" id="usernameInput" placeholder="Enter your username" maxlength="20">
+                <button id="joinBtn" class="btn btn-primary">Join Chat</button>
+            </div>
+        </div>
+
+        <div id="chatScreen" class="chat-screen hidden">
+            <div id="messages" class="messages"></div>
+            <div class="input-area">
+                <input type="text" id="messageInput" placeholder="Type your message..." maxlength="500">
+                <button id="sendBtn" class="btn btn-primary">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ChatClient {
+            constructor() {
+                this.ws = null;
+                this.username = '';
+                this.isConnected = false;
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                const joinBtn = document.getElementById('joinBtn');
+                const leaveBtn = document.getElementById('leaveBtn');
+                const sendBtn = document.getElementById('sendBtn');
+                const usernameInput = document.getElementById('usernameInput');
+                const messageInput = document.getElementById('messageInput');
+
+                joinBtn.addEventListener('click', () => this.joinChat());
+                leaveBtn.addEventListener('click', () => this.leaveChat());
+                sendBtn.addEventListener('click', () => this.sendMessage());
+
+                usernameInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.joinChat();
+                });
+
+                messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendMessage();
+                });
+            }
+
+            joinChat() {
+                const usernameInput = document.getElementById('usernameInput');
+                const username = usernameInput.value.trim();
+
+                if (!username) {
+                    alert('Please enter a username');
+                    return;
+                }
+
+                this.username = username;
+                this.connect();
+            }
+
+            connect() {
+                try {
+                    this.ws = new WebSocket('ws://localhost:8080');
+
+                    this.ws.onopen = () => {
+                        console.log('Connected to chat server');
+                        this.isConnected = true;
+                        
+                        // Send join message
+                        this.sendToServer({
+                            type: 'join',
+                            username: this.username
+                        });
+
+                        // Switch to chat screen
+                        this.showChatScreen();
+                    };
+
+                    this.ws.onmessage = (event) => {
+                        const message = JSON.parse(event.data);
+                        this.handleMessage(message);
+                    };
+
+                    this.ws.onclose = () => {
+                        console.log('Disconnected from chat server');
+                        this.isConnected = false;
+                        this.showLoginScreen();
+                        this.addSystemMessage('Connection lost. Please rejoin.');
+                    };
+
+                    this.ws.onerror = (error) => {
+                        console.error('WebSocket error:', error);
+                        this.addSystemMessage('Connection error. Please try again.');
+                    };
+
+                } catch (error) {
+                    console.error('Failed to connect:', error);
+                    alert('Failed to connect to chat server');
+                }
+            }
+
+            handleMessage(message) {
+                switch (message.type) {
+                    case 'join':
+                        this.addSystemMessage(`${message.username} joined the chat`);
+                        break;
+                    case 'leave':
+                        this.addSystemMessage(`${message.username} left the chat`);
+                        break;
+                    case 'message':
+                        this.addChatMessage(message.username, message.message, message.timestamp);
+                        break;
+                    case 'userCount':
+                        this.updateUserCount(message.count);
+                        break;
+                }
+            }
+
+            sendMessage() {
+                const messageInput = document.getElementById('messageInput');
+                const message = messageInput.value.trim();
+
+                if (!message || !this.isConnected) return;
+
+                this.sendToServer({
+                    type: 'message',
+                    message: message
+                });
+
+                messageInput.value = '';
+            }
+
+            sendToServer(data) {
+                if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+                    this.ws.send(JSON.stringify(data));
+                }
+            }
+
+            leaveChat() {
+                if (this.ws) {
+                    this.ws.close();
+                }
+                this.showLoginScreen();
+                this.clearMessages();
+            }
+
+            addChatMessage(username, message, timestamp) {
+                const messagesDiv = document.getElementById('messages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message';
+                
+                const time = new Date(timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const isOwnMessage = username === this.username;
+                
+                messageDiv.innerHTML = `
+                    <div class="message-content ${isOwnMessage ? 'own-message' : ''}">
+                        <div class="message-header">
+                            <span class="username">${username}</span>
+                            <span class="timestamp">${time}</span>
+                        </div>
+                        <div class="message-text">${this.escapeHtml(message)}</div>
+                    </div>
+                `;
+
+                messagesDiv.appendChild(messageDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+
+            addSystemMessage(message) {
+                const messagesDiv = document.getElementById('messages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message system-message';
+                messageDiv.textContent = message;
+                messagesDiv.appendChild(messageDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+
+            updateUserCount(count) {
+                const userCountSpan = document.getElementById('userCount');
+                userCountSpan.textContent = `${count} user${count !== 1 ? 's' : ''} online`;
+            }
+
+            showChatScreen() {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('chatScreen').classList.remove('hidden');
+                document.getElementById('leaveBtn').disabled = false;
+                document.getElementById('messageInput').focus();
+            }
+
+            showLoginScreen() {
+                document.getElementById('chatScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('leaveBtn').disabled = true;
+                document.getElementById('usernameInput').focus();
+            }
+
+            clearMessages() {
+                document.getElementById('messages').innerHTML = '';
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        // Initialize the chat client
+        const chatClient = new ChatClient();
+    </script>
+</body>
+</html>
