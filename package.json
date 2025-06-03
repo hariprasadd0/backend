@@ -1,0 +1,16 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend projects collection",
+  "private": true,
+  "workspaces": [
+    "websocket-chat"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=websocket-chat",
+    "build": "npm run build --workspace=websocket-chat",
+    "start": "npm run start --workspace=websocket-chat"
+  },
+  "author": "Hariprasad",
+  "license": "MIT"
+}
