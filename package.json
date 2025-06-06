@@ -4,7 +4,8 @@
   "description": "Backend projects collection",
   "private": true,
   "workspaces": [
-    "websocket-chat"
+    "websocket-chat",
+    "caching-proxy"
   ],
   "scripts": {
     "dev": "npm run dev --workspace=websocket-chat",
