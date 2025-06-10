@@ -9,14 +9,16 @@ A CLI tool that starts a proxy server to forward requests, cache responses, and 
 - Configurable in-memory or persistent cache
 - Cache expiration
 
+
 ## Directory Structure
 
 ```text
 caching-proxy/
-├── src/               # Source code
-│   ├── cli.ts
-│   └── ...            
-├── bin/             # Test cases
+├── src/               
+│   ├── cli.ts 
+│   ├── cache.ts
+│   └── server.ts           
+├── bin/             # executable
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -49,9 +51,8 @@ caching-proxy/
 ### Running the Proxy
 
 ```bash
-npm start
-# or for development
-npm run dev
+caching-proxy --port 3000 --origin http://example.com 
+cahcing-proxy --clear-cache
 ```
 
 The proxy should now be running on the configured port (default: `3000`). You can configure the port and other settings in the `.env` file or in `config.ts`.
