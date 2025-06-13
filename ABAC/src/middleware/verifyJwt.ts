@@ -3,7 +3,7 @@ import { Request, Response,NextFunction } from 'express';
 
 export const verifyJwt = (req: Request, res: Response, next: NextFunction) => {
     try{
-        const token = req.header('Authorization')?.replace('Bearer ', '');
+        const token = req.header('Authorization')?.replace('Bearer','');
         if (!token) {
             return res.status(401).send('No token provided');
         }
