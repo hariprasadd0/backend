@@ -1,0 +1,23 @@
+{
+  "user_policies": [
+    {
+      "subject": "user",
+      "resource": "user",
+      "action": "read"
+
+    },
+    {
+      "subject": "user",
+      "resource": "product",
+      "action": "read"
+
+    }
+  ],
+  "admin_policies": [
+    {
+      "subject": "admin",
+      "resource": "product",
+      "action": "read"
+    }
+  ]
+}
