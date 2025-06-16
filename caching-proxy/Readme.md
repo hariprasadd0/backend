@@ -18,7 +18,7 @@ caching-proxy/
 │   ├── cli.ts 
 │   ├── cache.ts
 │   └── server.ts           
-├── bin/             # executable
+├── bin/             #executable
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -29,7 +29,7 @@ caching-proxy/
 ### Prerequisites
 
 - Node.js (v18+ recommended)
-- pnpm or yarn
+- pnpm
 
 ### Installation
 
@@ -44,26 +44,21 @@ caching-proxy/
 
     ```bash
     pnpm install
-    # or
-    yarn install
     ```
 
 ### Running the Proxy
 
 ```bash
 caching-proxy --port 3000 --origin http://example.com 
-cahcing-proxy --clear-cache
 ```
-
-The proxy should now be running on the configured port (default: `3000`). You can configure the port and other settings in the `.env` file or in `config.ts`.
 
 ### Usage
+``--port <number>`` — Port to run the proxy on
 
-Send your HTTP requests to the proxy server. It will forward requests, cache responses according to the defined strategy, and serve cached responses when appropriate.
+`--origin <url>` — Origin endpoint to proxy and cache
 
-Example:
+`--clear-cache` — Clears the in-memory cache
 
-```bash
-curl http://localhost:3000/api/data
-```
+
+
 
