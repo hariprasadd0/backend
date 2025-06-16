@@ -1,14 +1,9 @@
 import jwt from 'jsonwebtoken';
+import {User} from "../types/role.ts";
 
-type Payload = {
-    id: string;
-    email: string
+export const generateAccessToken = (payload:User) => {
+    return jwt.sign(payload, process.env.JWT_ACCESS_SECRET as string,{
+        expiresIn:'15m',
+    });
 }
 
-export const generateAccessToken = (payload:Payload) => {
-    return jwt.sign(payload, process.env.JWT_ACCESS_SECRET as string);
-}
-
-export const generateRefreshToken = (payload:Payload) => {
-    return jwt.sign(payload, process.env.JWT_REFRESH_SECRET as string);
-}
