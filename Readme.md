@@ -5,18 +5,17 @@ A collection of mini backend projects
 ### 🔄 Caching Proxy
 A caching proxy service designed to improve performance by storing frequently requested data 
 
-**Location:** `./caching-proxy/`
+[caching-proxy](https://github.com/hariprasadd0/backend/tree/main/caching-proxy)
 
 ### 💬 WebSocket Chat
 A real-time chat application built with WebSocket 
 
-**Location:** `./websocket-chat/`
+[websocket-chat](https://github.com/hariprasadd0/backend/tree/main/websocket-chat)
 
 ### 🔐 ABAC (Attribute-Based Access Control)
 An attribute-based access control system 
 
-**Location:** `./ABAC/`
-
+[ABAC](https://github.com/hariprasadd0/backend/tree/main/ABAC)
 ## Getting Started
 
 Each project is self-contained with its own dependencies and setup instructions. Navigate to the respective project directory for detailed documentation.
