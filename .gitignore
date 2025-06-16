@@ -28,7 +28,7 @@ out/
 *.ntvs*
 *.njsproj
 *.sln
-
+TODO.txt
 # Coverage reports
 coverage/
 .nyc_output/
