@@ -1,1 +1,6 @@
-// we have 3 types of roles admin , users , vendors
+export interface User {
+    id: string;
+    email: string;
+    role: string;
+    username: string;
+}
